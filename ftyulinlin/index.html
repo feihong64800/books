@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>全部</title>
+    <link rel="stylesheet" href="index.css">
+    <script src="../components/config.js"></script>
+    <style>
+        /* Header 导航 */
+        .header {
+            background: #fff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            padding: 10px 0;
+        }
+
+        .nav-main {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 0 15px;
+            flex-wrap: wrap;
+        }
+
+        .nav-item {
+            padding: 8px 14px;
+            color: #333;
+            text-decoration: none;
+            border-radius: 4px;
+            transition: all 0.3s;
+            font-size: 14px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .nav-item:hover,
+        .nav-item.active {
+            background: #4caf50;
+            color: #fff;
+        }
+
+        .nav-more {
+            position: relative;
+        }
+
+        .more-dropdown {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: #fff;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+            border-radius: 4px;
+            padding: 8px 0;
+            z-index: 100;
+            min-width: 100px;
+        }
+
+        .more-dropdown.show {
+            display: block;
+        }
+
+        .more-dropdown .nav-item {
+            display: block;
+            padding: 10px 20px;
+            white-space: nowrap;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Header 导航 -->
+    <div class="header">
+        <div class="nav-main" id="navMain">
+            <a href="index.html" class="nav-item active">主页</a>
+            <a href="zy.html" class="nav-item ">中医</a>
+            <a href="#" class="nav-item ">健美</a>
+            <a href="notice.html" target="_blank" class="nav-item ">公告</a>
+            <a href="https://shop260623877.taobao.com/" target="_blank" class="nav-item">淘宝交易</a>
+            <a href="../components/kefu_client.html" target="_blank" class="nav-item">客服</a>
+            <a href="https://qm.qq.com/q/cv9U0MzxRu" target="_blank" class="nav-item">QQ交谈</a>
+            <div class="nav-more">
+                <span class="nav-item" onclick="toggleMore()">更多 ▼</span>
+                <div class="more-dropdown" id="moreDropdown">
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 搜索框 -->
+    <div class="search-box">
+        <input type="text" id="searchInput" placeholder="搜索商品名称...">
+        <button onclick="doSearch()">搜索</button>
+    </div>
+
+    <!-- 标题 -->
+    <h2 class="section-title">推荐电子书</h2>
+
+    <!-- 大容器 -->
+    <div class="product-grid" id="productGrid">
+        <div class="loading">加载中...</div>
+    </div>
+
+    <!-- 分页 -->
+    <div class="pagination" id="pagination"></div>
+
+    <script>
+        // 渲染商品卡片
+        function renderProducts(data) {
+            const grid = document.getElementById('productGrid');
+
+            // 分成两行，每行 4 个
+            const row1 = data.slice(0, 4);
+            const row2 = data.slice(4, 8);
+
+            let html = '';
+
+            // 第一行
+            html += '<div class="row">';
+            row1.forEach(item => {
+                html += `
+                    <div class="card">
+                        <img src="webp/${item.id}.webp" alt="${item.name}" title="点击查看大图" onclick="showImage(this.src)">
+                        <div class="name">${item.name}</div>
+                        <button data-id="${item.id}" onclick="viewDetail(this)">在线阅读</button>
+                    </div>
+                `;
+            });
+            html += '</div>';
+
+            // 第二行
+            html += '<div class="row">';
+            row2.forEach(item => {
+                html += `
+                    <div class="card">
+                        <img src="webp/${item.id}.webp" alt="${item.name}" title="点击查看大图" onclick="showImage(this.src)">
+                        <div class="name">${item.name}</div>
+                        <button data-id="${item.id}" onclick="viewDetail(this)">在线阅读</button>
+                    </div>
+                `;
+            });
+            html += '</div>';
+
+            grid.innerHTML = html;
+        }
+
+        // 查看详情按钮处理
+        function viewDetail(btn) {
+            const id = btn.getAttribute('data-id');
+            sessionStorage.setItem('productId', id);//将商品ID存储到sessionStorage
+            window.location.href = 'detail.html';
+        }
+
+        // 点击图片查看大图
+        function showImage(src) {
+            const overlay = document.createElement('div');
+            overlay.className = 'image-overlay';
+            overlay.innerHTML = `
+                <span class="close-btn">&times;</span>
+                <img src="${src}">
+            `;
+            overlay.onclick = function () {
+                overlay.remove();
+            };
+            overlay.querySelector('.close-btn').onclick = function (e) {
+                e.stopPropagation();
+                overlay.remove();
+            };
+            document.body.appendChild(overlay);
+        }
+
+        // 回车键搜索
+        document.getElementById('searchInput').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                doSearch(1);
+            }
+        });
+
+        // 查询数据
+        async function queryData(keyword, limit, page) {
+            const currentPage = page || 1;
+            const currentLimit = limit || 8;
+            const offset = (currentPage - 1) * currentLimit;
+
+            try {
+                const response = await fetch(CONFIG.BASE_URL + '/yulinlin/index.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        keyword: keyword,
+                        limit: currentLimit,
+                        offset: offset
+                    })
+                });
+
+                const result = await response.json();
+
+                if (!result.success) {
+                    document.getElementById('productGrid').innerHTML = '<div class="loading">错误: ' + result.msg + '</div>';
+                    return null;
+                }
+
+                return { data: result.data, total: result.total };
+
+            } catch (error) {
+                document.getElementById('productGrid').innerHTML = '<div class="loading">错误: ' + error + '</div>';
+                return null;
+            }
+        }
+
+        // 渲染分页按钮
+        function renderPagination(total, limit, page) {
+            const totalPages = Math.ceil(total / limit);
+            const pagination = document.getElementById('pagination');
+
+            let html = `<span>共 ${total} 条 | 第 ${page} / ${totalPages} 页</span>`;
+
+            if (page > 1) {
+                html += `<button onclick="doSearch(${page - 1})">上一页</button>`;
+            }
+
+            if (page < totalPages) {
+                html += `<button onclick="doSearch(${page + 1})">下一页</button>`;
+            }
+
+            pagination.innerHTML = html;
+        }
+
+        // 搜索/初始化
+        async function doSearch(page) {
+            const limit = 8;
+            const keyword = document.getElementById('searchInput').value.trim();
+
+            const result = await queryData(keyword, limit, page);
+            if (result && result.data) {
+                renderProducts(result.data);
+                renderPagination(result.total, limit, page);
+            }
+        }
+
+        doSearch(1);
+
+        // Header 导航功能
+        function toggleMore() {
+            const dropdown = document.getElementById('moreDropdown');
+            dropdown.classList.toggle('show');
+        }
+
+        // 点击外部关闭更多菜单
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.nav-more')) {
+                const dropdown = document.getElementById('moreDropdown');
+                if (dropdown) dropdown.classList.remove('show');
+            }
+        });
+    </script>
+</body>
+
+</html>

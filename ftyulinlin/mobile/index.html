@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <title>全部</title>
+    <link rel="stylesheet" href="mobile.css">
+    <script src="../../components/config.js"></script>
+</head>
+<body>
+    <!-- Header 导航 -->
+    <div class="header">
+        <div class="nav-scroll">
+            <div class="nav-main" id="navMain">
+                <a href="index.html" class="nav-item active">主页</a>
+                <a href="zy.html" class="nav-item">中医</a>
+                <a href="notice.html" class="nav-item">公告</a>
+                <a href="https://shop260623877.taobao.com/" class="nav-item">淘宝</a>
+                <a href="../../components/kefu_mobile.html" class="nav-item">客服</a>
+                <a href="javascript:void(0)" class="nav-item" onclick="return scrollNav()">更多-></a>
+                <a href="https://qm.qq.com/q/cv9U0MzxRu"  class="nav-item">QQ交谈</a>
+                <a href="#" class="nav-item">健美</a>
+            </div>        </div>
+    </div>
+
+    <!-- 搜索框 -->
+    <div class="search-box">
+        <input type="text" id="searchInput" placeholder="搜索商品名称...">
+        <button onclick="doSearch()">搜索</button>
+    </div>
+
+    <!-- 标题 -->
+    <h2 class="section-title">推荐电子书</h2>
+
+    <!-- 商品列表 -->
+    <div class="product-grid" id="productGrid">
+        <div class="loading">加载中...</div>
+    </div>
+
+    <!-- 分页 -->
+    <div class="pagination" id="pagination"></div>
+
+    <script>
+        // 渲染商品卡片
+        function renderProducts(data) {
+            const grid = document.getElementById('productGrid');
+            let html = '<div class="product-list">';
+
+            data.forEach(item => {
+                html += `
+                    <div class="product-card">
+                        <div class="card-image" onclick="showImage('webp/${item.id}.webp')">
+                            <img src="../webp/${item.id}.webp" alt="${item.name}" loading="lazy">
+                        </div>
+                        <div class="card-info">
+                            <div class="card-name">${item.name}</div>
+                            <button class="card-btn" onclick="viewDetail('${item.id}')">在线阅读</button>
+                        </div>
+                    </div>
+                `;
+            });
+
+            html += '</div>';
+            grid.innerHTML = html;
+        }
+
+        // 查看详情
+        function viewDetail(id) {
+            sessionStorage.setItem('productId', id);
+            window.location.href = 'detail_v2.html';
+        }
+
+        // 点击图片查看大图
+        function showImage(src) {
+            const overlay = document.createElement('div');
+            overlay.className = 'image-overlay';
+            overlay.innerHTML = `
+                <span class="close-btn">&times;</span>
+                <img src="${src}">
+            `;
+            overlay.onclick = function() {
+                overlay.remove();
+            };
+            overlay.querySelector('.close-btn').onclick = function(e) {
+                e.stopPropagation();
+                overlay.remove();
+            };
+            document.body.appendChild(overlay);
+        }
+
+        // 回车键搜索
+        document.getElementById('searchInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                doSearch(1);
+            }
+        });
+
+        // 查询数据
+        async function queryData(keyword, limit, page) {
+            const currentPage = page || 1;
+            const currentLimit = limit || 8;
+            const offset = (currentPage - 1) * currentLimit;
+
+            try {
+                const response = await fetch(CONFIG.BASE_URL + '/yulinlin/index.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        keyword: keyword,
+                        limit: currentLimit,
+                        offset: offset
+                    })
+                });
+
+                const result = await response.json();
+
+                if (!result.success) {
+                    document.getElementById('productGrid').innerHTML = '<div class="loading">错误: ' + result.msg + '</div>';
+                    return null;
+                }
+
+                return { data: result.data, total: result.total };
+
+            } catch (error) {
+                document.getElementById('productGrid').innerHTML = '<div class="loading">错误: ' + error + '</div>';
+                return null;
+            }
+        }
+
+        // 渲染分页
+        function renderPagination(total, limit, page) {
+            const totalPages = Math.ceil(total / limit);
+            const pagination = document.getElementById('pagination');
+
+            let html = `<span>共 ${total} 条 | 第 ${page} / ${totalPages} 页</span>`;
+
+            if (page > 1) {
+                html += `<button onclick="doSearch(${page - 1})">上一页</button>`;
+            }
+
+            if (page < totalPages) {
+                html += `<button onclick="doSearch(${page + 1})">下一页</button>`;
+            }
+
+            pagination.innerHTML = html;
+        }
+
+        // 搜索/初始化
+        async function doSearch(page) {
+            const limit = 8;
+            const keyword = document.getElementById('searchInput').value.trim();
+
+            const result = await queryData(keyword, limit, page);
+            if (result && result.data) {
+                renderProducts(result.data);
+                renderPagination(result.total, limit, page);
+            }
+        }
+
+        doSearch(1);
+
+        // 导航栏横向滚动
+        function scrollNav() {
+            var navScroll = document.querySelector('.nav-scroll');
+            navScroll.scrollBy({left: 150, behavior: 'smooth'});
+            return false;
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>支付结果</title>
+    <script src="../components/config.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: #fff;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+        }
+        .back-btn {
+            color: #666;
+            text-decoration: none;
+            font-size: 14px;
+            margin-bottom: 20px;
+            display: inline-block;
+        }
+        .back-btn:hover { color: #333; }
+        .success-title {
+            font-size: 28px;
+            color: #4caf50;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .info-label {
+            color: #666;
+        }
+        .info-value {
+            color: #333;
+            font-weight: bold;
+        }
+        .loading, .error {
+            text-align: center;
+            padding: 50px;
+            color: #999;
+        }
+        .error { color: #f44336; }
+
+        /* 下载区域 */
+        .download-section {
+            margin-top: 25px;
+        }
+        .download-card {
+            background: #fafafa;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 15px;
+        }
+        .download-card-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .download-card-title .icon {
+            font-size: 20px;
+        }
+        .download-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px dashed #e0e0e0;
+        }
+        .download-item:last-child {
+            border-bottom: none;
+        }
+        .download-label {
+            color: #666;
+            font-size: 14px;
+        }
+        .download-value {
+            color: #333;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            max-width: 60%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .copy-btn {
+            padding: 4px 10px;
+            background: #4caf50;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.3s;
+        }
+        .copy-btn:hover {
+            background: #45a049;
+        }
+        .copy-btn.copied {
+            background: #999;
+        }
+        .download-link {
+            color: #1976d2;
+            text-decoration: none;
+            display: inline-block;
+            max-width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .download-link:hover {
+            text-decoration: underline;
+        }
+        .open-btn {
+            display: inline-block;
+            padding: 8px 20px;
+            background: #1976d2;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            text-decoration: none;
+            margin-top: 10px;
+            transition: all 0.3s;
+        }
+        .open-btn:hover {
+            background: #1565c0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="container">
+        <div class="loading">加载中...</div>
+    </div>
+
+    <script>
+        // 复制到剪贴板
+        function copyToClipboard(text, btn) {
+            navigator.clipboard.writeText(text).then(() => {
+                const originalText = btn.textContent;
+                btn.textContent = '已复制';
+                btn.classList.add('copied');
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                    btn.classList.remove('copied');
+                }, 2000);
+            }).catch(err => {
+                // 降级方案
+                const textarea = document.createElement('textarea');
+                textarea.value = text;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                btn.textContent = '已复制';
+                btn.classList.add('copied');
+                setTimeout(() => {
+                    btn.textContent = '复制';
+                    btn.classList.remove('copied');
+                }, 2000);
+            });
+        }
+
+        // 加载结果
+        async function loadResult() {
+            const id = localStorage.getItem('productId');
+            const tradeNo = localStorage.getItem('tradeNo');
+            if (!id || !tradeNo) {
+                document.getElementById('container').innerHTML = 
+                    '<div class="error">缺少订单信息</div>';
+                return;
+            }
+
+            try {
+                const response = await fetch(CONFIG.BASE_URL + '/yulinlin/result.php?id=' + id + '&tradeNo=' + tradeNo);
+                const result = await response.json();
+
+                if (result.success) {
+                    const product = result.data;
+                    let html = `
+                        <a href="index.html" class="back-btn">← 返回主页</a>
+                        <div class="success-title">✓ 支付成功</div>
+                        <div class="info-row">
+                            <span class="info-label">订单号</span>
+                            <span class="info-value">${tradeNo}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">商品名称</span>
+                            <span class="info-value">${product.name}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">支付金额</span>
+                            <span class="info-value">¥${product.price}</span>
+                        </div>
+                    `;
+
+                    // 下载区域
+                    html += '<div class="download-section">';
+
+                    // 蓝奏云下载
+                    if (product.url_lz) {
+                        html += `
+                            <div class="download-card">
+                                <div class="download-card-title">
+                                    <span class="icon">📥</span>
+                                    蓝奏云下载
+                                </div>
+                                <div class="download-item">
+                                    <span class="download-label">链接</span>
+                                    <span class="download-value">
+                                        <a href="${product.url_lz}" target="_blank" class="download-link">${product.url_lz}</a>
+                                        <button class="copy-btn" onclick="copyToClipboard('${product.url_lz}', this)">复制</button>
+                                    </span>
+                                </div>
+                                ${product.psd_lz ? `
+                                <div class="download-item">
+                                    <span class="download-label">密码</span>
+                                    <span class="download-value">
+                                        <strong>${product.psd_lz}</strong>
+                                        <button class="copy-btn" onclick="copyToClipboard('${product.psd_lz}', this)">复制</button>
+                                    </span>
+                                </div>
+                                ` : ''}
+                                <a href="${product.url_lz}" target="_blank" class="open-btn">点击打开</a>
+                            </div>
+                        `;
+                    }
+
+                    // 百度网盘下载
+                    if (product.url_bd) {
+                        html += `
+                            <div class="download-card">
+                                <div class="download-card-title">
+                                    <span class="icon">📥</span>
+                                    百度网盘下载
+                                </div>
+                                <div class="download-item">
+                                    <span class="download-label">链接</span>
+                                    <span class="download-value">
+                                        <a href="${product.url_bd}" target="_blank" class="download-link">${product.url_bd}</a>
+                                        <button class="copy-btn" onclick="copyToClipboard('${product.url_bd}', this)">复制</button>
+                                    </span>
+                                </div>
+                                ${product.psd_bd ? `
+                                <div class="download-item">
+                                    <span class="download-label">提取码</span>
+                                    <span class="download-value">
+                                        <strong>${product.psd_bd}</strong>
+                                        <button class="copy-btn" onclick="copyToClipboard('${product.psd_bd}', this)">复制</button>
+                                    </span>
+                                </div>
+                                ` : ''}
+                                <a href="${product.url_bd}" target="_blank" class="open-btn">点击打开</a>
+                            </div>
+                        `;
+                    }
+
+                    html += '</div>';
+
+                    document.getElementById('container').innerHTML = html;
+                } else {
+                    document.getElementById('container').innerHTML = 
+                        '<div class="error">' + result.msg + '</div>';
+                }
+            } catch (err) {
+                document.getElementById('container').innerHTML = 
+                    '<div class="error">加载失败</div>';
+            }
+        }
+
+        // 页面加载时执行
+        loadResult();
+    </script>
+</body>
+</html>

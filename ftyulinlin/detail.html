@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>预览 v2.0</title>
+    <script src="../components/config.js"></script>
+    <script src="../components/qrcode.min.js"></script>
+    <link rel="stylesheet" href="detail.css">
+</head>
+<body>
+    <!-- 商品信息 + 二维码区域（支付时显示） -->
+    <div class="container" id="container">
+        <div class="loading">加载中...</div>
+    </div>
+
+    <!-- PDF 预览区域 -->
+    <div class="pdf-section" id="pdfSection">
+        <div class="pdf-canvas-wrapper">
+            <canvas id="pdf-canvas"></canvas>
+            <div class="pdf-placeholder" id="pdf-placeholder">正在加载...</div>
+        </div>
+        <div class="pdf-controls">
+            <button id="pdf-prev" onclick="changePdfPage(-1)">上一页</button>
+            <span class="pdf-page-info" id="pdf-page-info">加载中...</span>
+            <button id="pdf-next" onclick="changePdfPage(1)">下一页</button>
+        </div>
+    </div>
+
+    <!-- 按钮区域 -->
+    <div class="action-buttons" id="actionButtons">
+        <div class="btn-row">
+            <button class="pay-main-btn" id="payBtn" onclick="window.createOrder()">支付 <span id="payPrice">0</span> 元下载全文</button>
+        </div>
+        <div class="btn-row">
+            <a href="https://shop260623877.taobao.com/" target="_blank" class="action-btn" id="taobaoBtn">到淘宝交易</a>
+            <a href="index.html" class="action-btn">返回主页</a>
+            <a href="../components/kefu_client.html" target="_blank" class="action-btn" id="serviceBtn">与客服交流</a>
+        </div>
+    </div>
+
+    <!-- 二维码区域（支付时显示） -->
+    <div class="container qr-section" id="qrCodeDiv">
+        <div id="qr-content"></div>
+        <div id="status"></div>
+    </div>
+
+    <!-- PDF.js 模块脚本 -->
+    <script type="module">
+        import * as pdfjsLib from '../components/pdf.js';
+        pdfjsLib.GlobalWorkerOptions.workerSrc = '../components/pdf.worker.js';
+
+        // 暴露到全局
+        window.pdfjsLib = pdfjsLib;
+
+        /* ===== 原代码（需要总页数，等待整个PDF下载完） =====
+        // PDF 相关变量
+        var currentPdf = null;
+        var currentPage = 1;
+        var totalPages = 0;
+        var pdfLoaded = false;
+
+        // 加载 PDF，给window加一个方法loadPdf，用于在其他脚本中调用加载PDF
+        window.loadPdf = async function(url) {
+            const canvas = document.getElementById('pdf-canvas');
+            const pageInfo = document.getElementById('pdf-page-info');
+
+            try {
+                pageInfo.textContent = '正在加载...';
+                const loadingTask = pdfjsLib.getDocument(url);
+                currentPdf = await loadingTask.promise;
+                totalPages = currentPdf.numPages;
+                pdfLoaded = true;
+
+                renderPage(1);
+            } catch (error) {
+                console.error('PDF 加载失败:', error);
+                canvas.style.display = 'none';
+                pageInfo.textContent = '暂无资料';
+                document.getElementById('pdf-prev').disabled = true;
+                document.getElementById('pdf-next').disabled = true;
+            }
+        };
+
+        // 渲染指定页面
+        async function renderPage(pageNum) {
+            if (!currentPdf || pageNum < 1 || pageNum > totalPages) return;
+
+            const canvas = document.getElementById('pdf-canvas');
+            const ctx = canvas.getContext('2d');
+
+            try {
+                const page = await currentPdf.getPage(pageNum);
+                const scale = 1.2;
+                const viewport = page.getViewport({ scale });
+
+                canvas.height = viewport.height;
+                canvas.width = viewport.width;
+                canvas.style.display = 'block';
+
+                await page.render({
+                    canvasContext: ctx,
+                    viewport: viewport
+                }).promise;
+
+                currentPage = pageNum;
+                document.getElementById('pdf-page-info').textContent = 
+                    '第 ' + currentPage + ' / ' + totalPages + ' 页';
+                document.getElementById('pdf-placeholder').style.display = 'none';
+                document.getElementById('pdf-prev').disabled = currentPage <= 1;
+                document.getElementById('pdf-next').disabled = currentPage >= totalPages;
+            } catch (error) {
+                console.error('页面渲染失败:', error);
+            }
+        }
+
+        // 翻页
+        window.changePdfPage = function(delta) {
+            if (!pdfLoaded) return;
+            const newPage = currentPage + delta;
+            if (newPage >= 1 && newPage <= totalPages) {
+                renderPage(newPage);
+            }
+        };
+        ===== 原代码结束 ===== */
+
+        // ===== 新代码（不显示总页数，流式加载，下载多少显示多少） =====
+        var currentPdf = null;
+        var currentPage = 1;
+        var pdfLoading = false;
+        var reachedEnd = false;
+
+        // 加载 PDF
+        window.loadPdf = async function(url) {
+            const pageInfo = document.getElementById('pdf-page-info');
+
+            try {
+                pageInfo.textContent = '正在加载...';
+                const loadingTask = pdfjsLib.getDocument(url);
+                currentPdf = await loadingTask.promise;
+                reachedEnd = false;
+
+                renderPage(1);
+            } catch (error) {
+                console.error('PDF 加载失败:', error);
+                document.getElementById('pdf-canvas').style.display = 'none';
+                pageInfo.textContent = '暂无资料';
+                document.getElementById('pdf-prev').disabled = true;
+                document.getElementById('pdf-next').disabled = true;
+            }
+        };
+
+        // 渲染指定页面
+        async function renderPage(pageNum) {
+            if (!currentPdf || pageNum < 1) return;
+
+            const canvas = document.getElementById('pdf-canvas');
+            const ctx = canvas.getContext('2d');
+
+            try {
+                const page = await currentPdf.getPage(pageNum);
+                const scale = 1.2;
+                const viewport = page.getViewport({ scale });
+
+                canvas.height = viewport.height;
+                canvas.width = viewport.width;
+                canvas.style.display = 'block';
+
+                await page.render({
+                    canvasContext: ctx,
+                    viewport: viewport
+                }).promise;
+
+                currentPage = pageNum;
+                document.getElementById('pdf-page-info').textContent = '第 ' + currentPage + ' 页';
+                document.getElementById('pdf-placeholder').style.display = 'none';
+                document.getElementById('pdf-prev').disabled = currentPage <= 1;
+                document.getElementById('pdf-next').disabled = false;
+                reachedEnd = false;
+            } catch (error) {
+                // 页面不存在，说明已到末尾
+                console.log('已到末尾，无法加载第 ' + pageNum + ' 页');
+                reachedEnd = true;
+                document.getElementById('pdf-page-info').textContent = '已到末尾';
+                document.getElementById('pdf-next').disabled = true;
+            }
+        }
+
+        // 翻页
+        window.changePdfPage = function(delta) {
+            if (!currentPdf) return;
+            const newPage = currentPage + delta;
+            if (newPage < 1) return;
+            if (reachedEnd && delta > 0) return;
+            renderPage(newPage);
+        };
+        // ===== 新代码结束 =====
+    </script>
+
+    <!-- 主逻辑脚本 -->
+    <script>
+        // 全局变量
+        var currentProduct = null;
+
+        // 加载商品详情
+        async function loadProduct() {
+            const id = sessionStorage.getItem('productId');
+            if (!id) {
+                document.getElementById('container').innerHTML = 
+                    '<div class="error">缺少商品ID</div>';
+                return;
+            }
+
+            try {
+                const response = await fetch(CONFIG.BASE_URL + '/yulinlin/detail.php?id=' + id);
+                const result = await response.json();
+
+                if (result.success) {
+                        currentProduct = result.data;
+                        fetch(CONFIG.BASE_URL + '/model/stats.php?name=' + encodeURIComponent(currentProduct.name));
+                        
+                        // 更新支付按钮价格
+                        document.getElementById('payPrice').textContent = currentProduct.price;
+
+                        // 加载 PDF（等待模块加载完成）
+                        function tryLoadPdf() {
+                            if (window.loadPdf) {
+                                window.loadPdf('./preview/' + id + '.pdf');
+                            } else {
+                                setTimeout(tryLoadPdf, 100);
+                            }
+                        }
+                        tryLoadPdf();
+                    } else {
+                    document.getElementById('container').innerHTML = 
+                        '<div class="error">' + result.msg + '</div>';
+                }
+            } catch (err) {
+                document.getElementById('container').innerHTML = 
+                    '<div class="error">加载失败</div>';
+            }
+        }
+
+        // 支付宝逻辑
+        var checkTimer = null;
+        var isCreatingOrder = false;
+        var hasAlerted = false;
+
+        window.createOrder = function() {
+            if (isCreatingOrder) return;
+            isCreatingOrder = true;
+
+            // 停止轮询
+            if (checkTimer) clearInterval(checkTimer);
+
+            // 隐藏 PDF，显示商品信息和二维码
+            document.getElementById('pdfSection').style.display = 'none';
+            document.getElementById('actionButtons').style.display = 'none';
+            document.getElementById('container').style.display = 'block';
+            
+            // 设置容器内容
+            document.getElementById('container').innerHTML = `
+                <a href="index.html" class="back-btn">← 返回主页</a>
+                <div class="product-name">${currentProduct.name}</div>
+                <div class="product-price"><span>¥</span>${currentProduct.price}</div>
+                <div class="product-url">${currentProduct.url || ''}</div>
+            `;
+            document.getElementById('payBtn').textContent = '支付中...';
+            document.getElementById('payBtn').disabled = true;
+
+            var subject = currentProduct.name;
+            var amount = currentProduct.price;
+
+            fetch(CONFIG.BASE_URL + '/model/alipay/test_curl.php?subject=' + encodeURIComponent(subject) + '&amount=' + amount)
+                .then(response => response.text())
+                .then(text => {
+                    try {
+                        var data = JSON.parse(text);
+                        if (data.success) {
+                            // 后端PHP首次加载慢，改用前端生成二维码
+                            document.getElementById('qr-content').innerHTML = '';
+                            new QRCode(document.getElementById('qr-content'), {
+                                text: data.qr_code,
+                                width: 200,
+                                height: 200
+                            });
+                            document.getElementById('status').innerHTML = 
+                                '<div class="waiting">订单已创建，请使用支付宝扫码支付...</div>';
+                            document.getElementById('qrCodeDiv').classList.add('active');
+
+                            checkOrderStatus(data.trade_no);
+                        } else {
+                            document.getElementById('status').innerHTML = 
+                                '<div class="error">创建失败: ' + data.msg + '</div>';
+                            resetPayButton();
+                        }
+                    } catch(e) {
+                        console.error('JSON解析失败:', text);
+                        document.getElementById('status').innerHTML = 
+                            '<div class="error">后端返回错误</div>';
+                        resetPayButton();
+                    }
+                })
+                .catch(error => {
+                    console.error('请求错误:', error);
+                    document.getElementById('status').innerHTML = 
+                        '<div class="error">请求失败: ' + error.message + '</div>';
+                    resetPayButton();
+                });
+        };
+
+        function resetPayButton() {
+            document.getElementById('payBtn').textContent = '立即支付';
+            document.getElementById('payBtn').disabled = false;
+            isCreatingOrder = false;
+        }
+
+        function checkOrderStatus(tradeNo) {
+            checkTimer = setInterval(() => {
+                fetch(CONFIG.BASE_URL + '/model/alipay/query_order.php?tradeNo=' + tradeNo)
+                    .then(response => response.text())
+                    .then(text => {
+                        var data = JSON.parse(text);
+                        if (data.success) {
+                            if (data.status === 'TRADE_SUCCESS') {
+                                clearInterval(checkTimer);
+                                if (hasAlerted) return;
+                                hasAlerted = true;
+                                alert('支付成功！点击确定查看结果');
+                                localStorage.setItem('productId', currentProduct.id);
+                                localStorage.setItem('tradeNo', tradeNo);
+                                window.location.href = 'result.html';
+                            } else if (data.status === 'TRADE_CLOSED') {
+                                clearInterval(checkTimer);
+                                document.getElementById('status').innerHTML = 
+                                    '<div class="error">订单已关闭</div>';
+                                resetPayButton();
+                            }
+                        }
+                    })
+                    .catch(err => console.error('查询失败:', err));
+            }, 1000);
+        }
+
+        // 页面加载
+        loadProduct();
+    </script>
+</body>
+</html>
