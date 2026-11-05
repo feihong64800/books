@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>跳转中...</title>
+</head>
+<body>
+    <script>
+        // 入口页只做一件事：把渠道用 from 参数带到落地页，其余全部交给落地页处理
+        // 参数名不用 utm_source：那个名字对应的 URL 已被缓存咬住，换 from 等于换了个全新的缓存 key
+
+        // 检测设备类型
+        function isMobile() {
+            return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile/i.test(navigator.userAgent);
+        }
+
+        // 渠道值：从地址栏读 from，读不到就空着
+        const from = new URLSearchParams(location.search).get('from') || '';
+        const qs = '?x=1' + (from ? '&from=' + encodeURIComponent(from) : '');
+
+        if (isMobile()) {
+            window.location.href = 'ftyulinlin/mobile/index.html' + qs;
+        } else {
+            window.location.href = 'ftyulinlin/index.html' + qs;
+        }
+    </script>
+</body>
+</html>

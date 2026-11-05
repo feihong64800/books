@@ -1,0 +1,274 @@
+/* ===== 全局样式 ===== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+    background: #f5f5f5;
+    padding-bottom: 20px;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+/* ===== 商品信息容器 ===== */
+.container {
+    background: #fff;
+    border-radius: 12px;
+    padding: 20px;
+    margin: 15px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    display: none;
+}
+
+.back-btn {
+    color: #666;
+    text-decoration: none;
+    font-size: 14px;
+    margin-bottom: 15px;
+    display: inline-block;
+    padding: 8px 0;
+}
+
+.back-btn:active {
+    color: #333;
+}
+
+.product-name {
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 12px;
+    line-height: 1.4;
+}
+
+.product-price {
+    font-size: 28px;
+    color: #ff5722;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+.product-price span {
+    font-size: 16px;
+}
+
+.product-url {
+    color: #666;
+    font-size: 13px;
+    margin-bottom: 20px;
+    word-break: break-all;
+}
+
+.loading, .error {
+    text-align: center;
+    padding: 40px 20px;
+    color: #999;
+}
+
+.error {
+    color: #f44336;
+}
+
+/* ===== PDF 预览区域 ===== */
+.pdf-section {
+    margin: 15px;
+    border: 1px solid #e0e0e0;
+    border-radius: 12px;
+    background: #fafafa;
+    height: calc(100vh - 200px);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.pdf-canvas-wrapper {
+    flex: 1;
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
+    text-align: center;
+    padding: 10px;
+}
+
+#pdf-canvas {
+    display: block;
+    margin: 0 auto;
+    max-width: 100%;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.pdf-controls {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    align-items: center;
+    padding: 12px;
+    background: #fff;
+    border-top: 1px solid #e0e0e0;
+    flex-shrink: 0;
+}
+
+.pdf-controls button {
+    padding: 10px 20px;
+    border: 1px solid #ddd;
+    background: #fff;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    min-width: 80px;
+}
+
+.pdf-controls button:active {
+    background: #f0f0f0;
+}
+
+.pdf-controls button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.pdf-page-info {
+    font-size: 14px;
+    color: #666;
+    min-width: 80px;
+    text-align: center;
+}
+
+.pdf-placeholder {
+    text-align: center;
+    padding: 40px 20px;
+    color: #999;
+    font-size: 14px;
+}
+
+/* ===== 按钮区域 ===== */
+.action-buttons {
+    margin: 15px;
+    background: #fff;
+    border-radius: 12px;
+    padding: 15px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.pay-main-btn {
+    width: 100%;
+    padding: 14px;
+    background: #4caf50;
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-bottom: 12px;
+}
+
+.pay-main-btn:active {
+    background: #45a049;
+}
+
+.pay-main-btn:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+}
+
+.btn-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.btn-row:last-child {
+    margin-bottom: 0;
+}
+
+.action-btn {
+    flex: 1;
+    padding: 12px;
+    background: #f5f5f5;
+    color: #333;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 14px;
+    cursor: pointer;
+    text-decoration: none;
+    text-align: center;
+    transition: all 0.2s;
+}
+
+.action-btn:active {
+    background: #4caf50;
+    color: #fff;
+    border-color: #4caf50;
+}
+
+.action-btn.full-width {
+    flex: 1;
+}
+
+/* ===== 二维码区域 ===== */
+.qr-section {
+    text-align: center;
+    display: none;
+}
+
+.qr-section.active {
+    display: block;
+}
+
+#qr-content {
+    display: flex;
+    justify-content: center;
+    margin: 20px 0;
+}
+
+#qr-content img {
+    width: 200px;
+    height: 200px;
+    border: 1px solid #e0e0e0;
+    border-radius: 12px;
+    padding: 10px;
+    background: #fff;
+}
+
+#status {
+    margin-top: 15px;
+    padding: 0 15px;
+}
+
+.status-msg {
+    margin-top: 15px;
+    padding: 12px;
+    border-radius: 8px;
+    text-align: center;
+    font-size: 14px;
+}
+
+.waiting {
+    background: #fff3e0;
+    color: #e65100;
+    padding: 12px;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.success {
+    background: #e8f5e9;
+    color: #2e7d32;
+    padding: 12px;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.error {
+    background: #ffebee;
+    color: #c62828;
+    padding: 12px;
+    border-radius: 8px;
+    text-align: center;
+}

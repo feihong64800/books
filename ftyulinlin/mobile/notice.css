@@ -1,0 +1,231 @@
+/* ===== 全局样式 ===== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+    background: #f5f5f5;
+    padding-bottom: 20px;
+    font-size: 14px;
+    line-height: 1.8;
+    color: #333;
+}
+
+/* ===== Header 导航 ===== */
+.header {
+    background: #fff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.nav-scroll {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+}
+
+.nav-scroll::-webkit-scrollbar {
+    display: none;
+}
+
+.nav-main {
+    display: flex;
+    align-items: center;
+    padding: 12px 15px;
+    white-space: nowrap;
+    gap: 8px;
+}
+
+.nav-item {
+    padding: 6px 12px;
+    color: #333;
+    text-decoration: none;
+    border-radius: 16px;
+    transition: all 0.3s;
+    font-size: 13px;
+    cursor: pointer;
+    user-select: none;
+    flex-shrink: 0;
+}
+
+.nav-item:hover,
+.nav-item.active {
+    background: #4caf50;
+    color: #fff;
+}
+
+/* ===== 更多下拉框 ===== */
+.nav-more {
+    position: relative;
+    flex-shrink: 0;
+}
+
+.more-dropdown {
+    display: none;
+    position: absolute;
+    top: calc(100% + 6px);
+    right: 0;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+    min-width: 120px;
+    overflow: hidden;
+    z-index: 200;
+    animation: dropdownIn 0.2s ease;
+}
+
+@keyframes dropdownIn {
+    from {
+        opacity: 0;
+        transform: translateY(-6px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.more-dropdown.show {
+    display: block;
+}
+
+.dropdown-item {
+    display: block;
+    padding: 12px 16px;
+    color: #333;
+    text-decoration: none;
+    font-size: 14px;
+    border-bottom: 1px solid #f0f0f0;
+    transition: background 0.2s;
+    white-space: nowrap;
+}
+
+.dropdown-item:last-child {
+    border-bottom: none;
+}
+
+.dropdown-item:active {
+    background: #f5f5f5;
+}
+
+/* ===== 容器 ===== */
+.container {
+    padding: 15px;
+}
+
+.notice-card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.notice-title {
+    text-align: center;
+    font-size: 20px;
+    color: #4caf50;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #e8f5e9;
+    font-weight: 600;
+}
+
+/* ===== 公告区块 ===== */
+.notice-section {
+    margin-bottom: 20px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.notice-section:last-of-type {
+    border-bottom: none;
+}
+
+.notice-section h3 {
+    color: #4caf50;
+    font-size: 16px;
+    margin-bottom: 10px;
+    font-weight: 600;
+}
+
+.notice-section p {
+    color: #555;
+    font-size: 14px;
+    line-height: 1.8;
+}
+
+.highlight {
+    background: #e8f5e9;
+    padding: 2px 6px;
+    border-radius: 4px;
+    color: #2e7d32;
+    font-weight: 500;
+}
+
+/* ===== 联系框 ===== */
+.contact-box {
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 20px;
+    margin-top: 20px;
+    text-align: center;
+}
+
+.contact-box h3 {
+    color: #4caf50;
+    font-size: 16px;
+    margin-bottom: 10px;
+    font-weight: 600;
+}
+
+.contact-desc {
+    margin-bottom: 15px;
+    color: #666;
+    font-size: 14px;
+}
+
+.contact-links {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
+.contact-btn {
+    flex: 1;
+    display: inline-block;
+    padding: 12px 20px;
+    background: #4caf50;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 8px;
+    transition: all 0.2s;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.contact-btn:active {
+    background: #45a049;
+}
+
+.contact-hint {
+    margin-top: 15px;
+    color: #999;
+    font-size: 12px;
+}
+
+/* ===== 底部文字 ===== */
+.footer-text {
+    text-align: center;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #e0e0e0;
+    color: #4caf50;
+    font-size: 18px;
+    font-weight: 600;
+}
