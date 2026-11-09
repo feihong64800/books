@@ -1,0 +1,213 @@
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+    font-family: 'Microsoft YaHei', sans-serif;
+    background: #f5f5f5;
+    padding: 0 20px;
+}
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    background: #fff;
+    border-radius: 12px;
+    padding: 30px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+    display: none;
+}
+.back-btn {
+    color: #666;
+    text-decoration: none;
+    font-size: 14px;
+    margin-bottom: 20px;
+    display: inline-block;
+}
+.back-btn:hover { color: #333; }
+.product-name {
+    font-size: 24px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 15px;
+}
+.product-price {
+    font-size: 32px;
+    color: #ff5722;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+.product-price span {
+    font-size: 18px;
+}
+.product-url {
+    color: #666;
+    font-size: 14px;
+    margin-bottom: 30px;
+    word-break: break-all;
+}
+.pay-btn {
+    width: 100%;
+    padding: 15px;
+    background: #ff5722;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 18px;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 4px 12px rgba(255, 87, 34, 0.3);
+}
+.pay-btn:hover { 
+    background: #e64a19; 
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(255, 87, 34, 0.4);
+}
+.pay-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 8px rgba(255, 87, 34, 0.3);
+}
+.loading, .error {
+    text-align: center;
+    padding: 50px;
+    color: #999;
+}
+.error { color: #f44336; }
+
+/* PDF 预览区域 */
+.pdf-section {
+    max-width: 800px;
+    margin: 0 auto 10px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    background: #fafafa;
+    height: calc(100vh - 110px);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+.pdf-canvas-wrapper {
+    flex: 1;
+    overflow: auto;
+    text-align: center;
+    padding: 8px;
+}
+#pdf-canvas {
+    display: block;
+    margin: 0 auto;
+    max-width: 100%;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+.pdf-controls {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    align-items: center;
+    padding: 6px 0;
+    background: #fff;
+    border-top: 1px solid #e0e0e0;
+    flex-shrink: 0;
+}
+.pdf-controls button {
+    padding: 5px 15px;
+    border: 1px solid #ddd;
+    background: #fff;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+}
+.pdf-controls button:hover {
+    background: #f0f0f0;
+}
+.pdf-controls button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+.pdf-page-info {
+    font-size: 14px;
+    color: #666;
+    min-width: 80px;
+    text-align: center;
+}
+.pdf-placeholder {
+    text-align: center;
+    padding: 20px;
+    color: #999;
+    font-size: 14px;
+}
+
+/* 按钮区域 */
+.action-buttons {
+    max-width: 800px;
+    margin: 0 auto 10px;
+    background: #fff;
+    border-radius: 8px;
+    padding: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+.action-buttons .btn-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 5px;
+}
+.action-buttons .btn-row:last-child {
+    margin-bottom: 0;
+}
+.pay-main-btn {
+    flex: 2;
+    padding: 8px;
+    background: #4caf50;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+.pay-main-btn:hover {
+    background: #45a049;
+}
+.pay-main-btn:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+}
+.action-btn {
+    flex: 1;
+    padding: 6px;
+    background: #f5f5f5;
+    color: #333;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+    cursor: pointer;
+    text-decoration: none;
+    text-align: center;
+    transition: all 0.3s;
+}
+.action-btn:hover {
+    background: #4caf50;
+    color: #fff;
+    border-color: #4caf50;
+}
+
+/* 二维码区域 */
+.qr-section {
+    margin-top: 20px;
+    text-align: center;
+    display: none;
+}
+.qr-section.active {
+    display: block;
+}
+.qr-section img {
+    width: 200px;
+    height: 200px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 10px;
+    background: #fff;
+}
+.status-msg {
+    margin-top: 15px;
+    padding: 10px;
+    border-radius: 6px;
+    text-align: center;
+}
+.waiting { background: #fff3e0; color: #e65100; text-align: left; }
+.success { background: #e8f5e9; color: #2e7d32; }

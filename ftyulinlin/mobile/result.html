@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>支付结果</title>
+    <script src="../../components/config.js"></script>
+    <link rel="stylesheet" href="result.css">
+</head>
+<body>
+    <div class="container" id="container">
+        <div class="loading">加载中...</div>
+    </div>
+
+    <script>
+        // 复制到剪贴板
+        function copyToClipboard(text, btn) {
+            navigator.clipboard.writeText(text).then(() => {
+                const originalText = btn.textContent;
+                btn.textContent = '已复制';
+                btn.classList.add('copied');
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                    btn.classList.remove('copied');
+                }, 2000);
+            }).catch(err => {
+                const textarea = document.createElement('textarea');
+                textarea.value = text;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                btn.textContent = '已复制';
+                btn.classList.add('copied');
+                setTimeout(() => {
+                    btn.textContent = '复制';
+                    btn.classList.remove('copied');
+                }, 2000);
+            });
+        }
+
+        // 加载结果
+        async function loadResult() {
+            const id = localStorage.getItem('productId');
+            const tradeNo = localStorage.getItem('tradeNo');
+            if (!id || !tradeNo) {
+                document.getElementById('container').innerHTML = 
+                    '<div class="error">缺少订单信息</div>';
+                return;
+            }
+
+            try {
+                const response = await fetch(CONFIG.BASE_URL + '/yulinlin/result.php?id=' + id + '&tradeNo=' + tradeNo);
+                const result = await response.json();
+
+                if (result.success) {
+                    const product = result.data;
+                    let html = `
+                        <a href="index.html" class="back-btn">← 返回</a>
+                        <div class="success-title">✓ 支付成功</div>
+                        <div class="info-card">
+                            <div class="info-row">
+                                <span class="info-label">订单号</span>
+                                <span class="info-value">${tradeNo}</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">商品名称</span>
+                                <span class="info-value">${product.name}</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">支付金额</span>
+                                <span class="info-value price">¥${product.price}</span>
+                            </div>
+                        </div>
+                    `;
+
+                    html += '<div class="download-section">';
+
+                    // 蓝奏云下载
+                    if (product.url_lz) {
+                        html += `
+                            <div class="download-card">
+                                <div class="download-card-title">蓝奏云下载</div>
+                                <div class="download-item">
+                                    <span class="download-label">链接</span>
+                                </div>
+                                <div class="download-link-wrapper">
+                                    <a href="${product.url_lz}" target="_blank" class="download-link">${product.url_lz}</a>
+                                </div>
+                                <div class="download-actions">
+                                    <button class="copy-btn" onclick="copyToClipboard('${product.url_lz}', this)">复制链接</button>
+                                    <a href="${product.url_lz}" target="_blank" class="open-btn">打开链接</a>
+                                </div>
+                                ${product.psd_lz ? `
+                                <div class="download-item">
+                                    <span class="download-label">密码</span>
+                                </div>
+                                <div class="password-wrapper">
+                                    <span class="password-text">${product.psd_lz}</span>
+                                    <button class="copy-btn" onclick="copyToClipboard('${product.psd_lz}', this)">复制密码</button>
+                                </div>
+                                ` : ''}
+                            </div>
+                        `;
+                    }
+
+                    // 百度网盘下载
+                    if (product.url_bd) {
+                        html += `
+                            <div class="download-card">
+                                <div class="download-card-title">百度网盘下载</div>
+                                <div class="download-item">
+                                    <span class="download-label">链接</span>
+                                </div>
+                                <div class="download-link-wrapper">
+                                    <a href="${product.url_bd}" target="_blank" class="download-link">${product.url_bd}</a>
+                                </div>
+                                <div class="download-actions">
+                                    <button class="copy-btn" onclick="copyToClipboard('${product.url_bd}', this)">复制链接</button>
+                                    <a href="${product.url_bd}" target="_blank" class="open-btn">打开链接</a>
+                                </div>
+                                ${product.psd_bd ? `
+                                <div class="download-item">
+                                    <span class="download-label">提取码</span>
+                                </div>
+                                <div class="password-wrapper">
+                                    <span class="password-text">${product.psd_bd}</span>
+                                    <button class="copy-btn" onclick="copyToClipboard('${product.psd_bd}', this)">复制提取码</button>
+                                </div>
+                                ` : ''}
+                            </div>
+                        `;
+                    }
+
+                    html += '</div>';
+
+                    document.getElementById('container').innerHTML = html;
+                } else {
+                    document.getElementById('container').innerHTML = 
+                        '<div class="error">' + result.msg + '</div>';
+                }
+            } catch (err) {
+                document.getElementById('container').innerHTML = 
+                    '<div class="error">加载失败</div>';
+            }
+        }
+
+        loadResult();
+    </script>
+</body>
+</html>

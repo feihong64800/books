@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+    <meta charset="utf-8">
+
+    <title>跳转中...</title>
+
+    <script>
+
+        // 商品推广分流页：books.yulinlin.cn/go_detail.html?id=3
+        // 一个链接同时适配电脑和手机，判断设备后跳到对应的商品详情页
+        // id 由站长自己投广告时手工加上，站内点击不会经过这里
+
+        function isMobile() {
+            if (navigator.userAgentData && typeof navigator.userAgentData.mobile === 'boolean') {
+                return navigator.userAgentData.mobile;
+            }
+            return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile/i.test(navigator.userAgent);
+        }
+
+        var id = (new URLSearchParams(location.search).get('id') || '').trim();
+
+        // 没带 id 就回入口页，由入口页拼好统计参数再跳到落地页，这样这次访问也能被统计到
+        var target = id
+            ? (isMobile() ? 'ftyulinlin/mobile/detail_v2.html' : 'ftyulinlin/detail.html') + '?id=' + encodeURIComponent(id)
+            : './index.html';
+
+        // 用 replace，不留这一跳在浏览器的前进后退历史里
+        location.replace(target);
+
+    </script>
+
+</head>
+
+<body></body>
+
+</html>

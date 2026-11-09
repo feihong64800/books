@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>网站公告</title>
+    <script src="../../components/config.js"></script>
+    <link rel="stylesheet" href="notice.css">
+    <style>
+        .friend-links {
+            background: #fff;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .friend-links h3 {
+            text-align: center;
+            color: #4caf50;
+            font-size: 16px;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e8f5e9;
+        }
+
+        .links-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .friend-link {
+            display: inline-block;
+            padding: 8px 14px;
+            background: #e8f5e9;
+            color: #2e7d32;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 13px;
+            transition: all 0.3s;
+        }
+
+        .friend-link:hover {
+            background: #4caf50;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header 导航 -->
+    <div class="header">
+        <div class="nav-scroll">
+            <div class="nav-main" id="navMain">
+                <a href="index.html" class="nav-item">主页</a>
+                <a href="zy.html" class="nav-item">中医</a>
+                <a href="notice.html" class="nav-item active">公告</a>
+                <a href="https://shop260623877.taobao.com/" class="nav-item">淘宝</a>
+                <a href="../../components/kefu_mobile.html" class="nav-item">客服</a>
+                <a href="javascript:void(0)" class="nav-item" onclick="return scrollNav()">更多-></a>
+                <a href="https://qm.qq.com/q/cv9U0MzxRu"  class="nav-item">QQ交谈</a>
+                <a href="#" class="nav-item">健美</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="notice-card">
+            <h1 class="notice-title">📢 网站公告</h1>
+
+            <div class="notice-section">
+                <h3>📚 关于本站</h3>
+                <p>本站主要提供<span class="highlight">电子书在线阅读</span>、<span class="highlight">电子书出售</span>以及<span class="highlight">代搜服务</span>。我们致力于为广大读者提供便捷、优质的电子书资源获取渠道。</p>
+            </div>
+
+            <div class="notice-section">
+                <h3>⚡ 自动出售服务</h3>
+                <p>全自动化的购买流程，就像自动售货机买水一样简单：<span class="highlight">扫码 → 付款 → 自动获取下载地址</span>。24小时随时可购买，付款成功后立即获得资源下载链接。</p>
+            </div>
+
+            <div class="notice-section">
+                <h3>🛡️ 淘宝交易保障</h3>
+                <p>如果您对自动交易有所顾虑，我们也支持<span class="highlight">淘宝交易</span>。在淘宝店铺与客服沟通，确认需求后下单付款，享受淘宝的完整交易保障。</p>
+            </div>
+
+            <div class="notice-section">
+                <h3>🤝 资源合作</h3>
+                <p>如果您手中有<span class="highlight">优质电子书等其它资源</span>想要出售或分享，欢迎联系我们！我们可以为您提供展示平台，让资源帮助更多人，同时获得合理收益。</p>
+            </div>
+
+            <div class="notice-section">
+                <h3>🔍 代搜服务</h3>
+                <p>如果您在本站没有找到想要的资源，可以联系客服进行<span class="highlight">代搜服务</span>。我们将尽力为您寻找所需的电子书资源。</p>
+            </div>
+
+            <div class="contact-box">
+                <h3>📞 联系我们</h3>
+                <p class="contact-desc">选择最方便的方式联系我们：</p>
+                <div class="contact-links">
+                    <a href="../../components/kefu_mobile.html" class="contact-btn">本站客服</a>
+                    <a href="https://qm.qq.com/q/cv9U0MzxRu" class="contact-btn" id="qqLink">QQ联系</a>
+                </div>
+                <p class="contact-hint">哪种方式方便就用哪种，我们会尽快回复！</p>
+            </div>
+
+            <div class="footer-text">
+                💰 祝大家发财！💰
+            </div>
+        </div>
+
+        <div class="friend-links">
+            <h3>友情链接</h3>
+            <div class="links-container">
+                <a class="friend-link" href="https://feihong64800.github.io/books" target="_blank">备用网址</a>
+                <a class="friend-link" href="https://www.yulinlin.cn" target="_blank">淘宝精选</a>
+                <a class="friend-link" href="https://so.yulinlin.cn" target="_blank">网盘搜索</a>
+                <a class="friend-link" href="https://me.yulinlin.cn" target="_blank">网址发布</a>
+                <a class="friend-link" href="https://shop260623877.taobao.com" target="_blank">淘宝店铺</a>
+                
+                <a class="friend-link" href="https://feihong64800.github.io" target="_blank">淘宝精选 备用网址</a>
+                <a class="friend-link" href="https://feihong64800.github.io/so" target="_blank">网盘搜索 备用网址</a>
+                <a class="friend-link" href="https://feihong64800.github.io/me" target="_blank">网址发布 备用网址</a>
+             
+            </div>
+        </div>
+    </div>
+
+    <script>
+        if (CONFIG.QQ_URL) {
+            document.getElementById('qqLink').href = CONFIG.QQ_URL;
+        }
+
+        // 导航栏横向滚动
+        function scrollNav() {
+            var navScroll = document.querySelector('.nav-scroll');
+            navScroll.scrollBy({left: 150, behavior: 'smooth'});
+            return false;
+        }
+    </script>
+</body>
+</html>
